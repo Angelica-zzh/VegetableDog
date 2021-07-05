@@ -17,6 +17,7 @@ import com.example.myclock.R;
 import com.example.myclock.tools.Utils;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,6 +29,7 @@ public class ClockView extends View {
     private float secondDegree;
     private float hourDegree;
     private float minuteDegree;
+    Rect textBound = new Rect();
 
     public ClockView(Context context) {
         super(context);
@@ -42,74 +44,34 @@ public class ClockView extends View {
         initPaint();
 
     }
-    private Timer timer = new Timer();
-    private TimerTask timerTask = new TimerTask() {
-        @Override
-        public void run() {
-            if(secondDegree == 360){
-                secondDegree = 0;
-            }
-            secondDegree += 6;
-            postInvalidate();
-        }
-    };
-    public void start(){
-        timer.schedule(timerTask,0,1000);
-    }
-
-    //时钟画笔
-    private Paint circlePaint,numPaint,poiPaint;
-
-    //时钟的圆形宽度，时钟半径，刻度宽度，刻度长度，时针宽度 ，分针宽度，秒针宽度
-    private float circleWidth,circleRadius,pointerWidth,pointerLength,hourWidth,minuteWidth,secondWidth;
-
-    //外圆的颜色，刻度的颜色，时针的颜色，分针颜色，秒针的颜色，数字颜色
-//    private int circleColor,pointerColor,hourColor,minuteColor,secondColor,numColor;
-
-//    public void Clock(Context context,AttributeSet attributeSet){
-//        init(context,attributeSet);
-//        initPaint();
-//        Calendar calendar = Calendar.getInstance();
-//        int hour = calendar.get(Calendar.HOUR);
-//        int minute = calendar.get(Calendar.MINUTE);
-//        int second = calendar.get(Calendar.SECOND);
-//        setTime(hour,minute,second);
-//
-//
+//    private Timer timer = new Timer();
+//    private TimerTask timerTask = new TimerTask() {
+//        @Override
+//        public void run() {
+//            if(secondDegree == 360){
+//                secondDegree = 0;
+//            }
+//            if(hourDegree == 360){
+//                hourDegree = 0;
+//            }
+//            if(minuteDegree == 360){
+//                minuteDegree = 0;
+//            }
+//            secondDegree += 6;
+//            minuteDegree +=0.1f;
+//            hourDegree += 1.0f/120;
+//            postInvalidate();
+//        }
+//    };
+//    public void start(){
+//        timer.schedule(timerTask,0,1000);
 //    }
-
-//    public void init(Context context,AttributeSet attributeSet){
-//        TypedArray typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.ClockView);
-//        circleWidth = typedArray.getDimension(R.styleable.ClockView_clockRingWidth, Utils.dip2px(context,4));
-//        pointerWidth = typedArray.getDimension(R.styleable.ClockView_pointerWidth, Utils.dip2px(context,1));
-//        hourWidth = typedArray.getDimension(R.styleable.ClockView_hourWidth,5);
-//        minuteWidth = typedArray.getDimension(R.styleable.ClockView_minuteWidth,3);
-//        secondWidth = typedArray.getDimension(R.styleable.ClockView_secondWidth,2);
-//
-//        circleColor = typedArray.getColor(R.styleable.ClockView_clockColor, Color.GREEN);
-//        pointerColor = typedArray.getColor(R.styleable.ClockView_pointerColor,Color.YELLOW);
-//        hourColor = typedArray.getColor(R.styleable.ClockView_hourColor,Color.RED);
-//        minuteColor = typedArray.getColor(R.styleable.ClockView_minuteColor,Color.RED);
-//        secondColor = typedArray.getColor(R.styleable.ClockView_sencondColor,Color.BLACK);
-//        typedArray.recycle();
-//
+//    public void stop(){
+//        if(timer!=null){
+//            timer.cancel();
+//        }
 //    }
-    //设置画笔
     public void initPaint(){
-//        //时钟画笔
-//        circlePaint = new Paint();
-//        circlePaint.setAntiAlias(true);
-//        circlePaint.setStyle(Paint.Style.STROKE);
-//        //指针画笔
-//        poiPaint= new Paint();
-//        poiPaint.setAntiAlias(true);
-//        poiPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-//        poiPaint.setStrokeCap(Paint.Cap.ROUND);
-//        //数字画笔
-//        numPaint = new Paint();
-//        numPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-//        numPaint.setTextSize(60);
-//        numPaint.setColor(numColor);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.BLACK);
@@ -118,8 +80,38 @@ public class ClockView extends View {
 
     }
 
-    public void setTime(int hour,int minute,int second){
+//    public void updateClock(){
+//        if(secondDegree == 360){
+//            secondDegree = 0;
+//        }
+//        if(hourDegree == 360){
+//            hourDegree = 0;
+//        }
+//        if(minuteDegree == 360){
+//            minuteDegree = 0;
+//        }
+//        secondDegree += 6;
+//        minuteDegree +=0.1f;
+//        hourDegree += 1.0f/120;
+//        invalidate();
+//    }
+    public void setTime(Calendar calendar){
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+        Log.d(TAG,"hour"+hour);
+        Log.d(TAG,"minute"+minute);
+        Log.d(TAG,"second"+second);
+        //24小时制
+        if(hour >= 12){
+            hourDegree = (hour + minute * 1.0f/60f + second *1.0f/3600f -12)*30f;
+        }else {
+            hourDegree = (hour + minute * 1.0f/60f + second *1.0f/3600f)*30f;
+        }
 
+        minuteDegree = (minute+second*1.0f/60f)*6f;
+        secondDegree = second*6f;
+        invalidate();
     }
 
     Point center = new Point();
@@ -134,20 +126,20 @@ public class ClockView extends View {
 
         //画圆
         mPaint.setStrokeWidth(3);
-        canvas.drawCircle(getWidth()/2,getHeight()/2,getWidth()/3,mPaint);
+        canvas.drawCircle(center.x,center.y,radius,mPaint);
         //圆心
         mPaint.setStrokeWidth(8);
-        canvas.drawPoint(getWidth()/2,getHeight()/2,mPaint);
+        canvas.drawPoint(center.x,center.y,mPaint);
         //画刻度
         mPaint.setStrokeWidth(1);
-        canvas.translate(getWidth()/2,getHeight()/2);
+        canvas.translate(center.x,center.y);
         for(int i=0;i<360;i++){
             if(i%30 == 0){//长刻度
-                canvas.drawLine(getWidth()/3-25,0,getWidth()/3,0,mPaint);
+                canvas.drawLine(radius-25,0,radius,0,mPaint);
             }else if(i%6 == 0){//中刻度
-                canvas.drawLine(getWidth()/3-14,0,getWidth()/3,0,mPaint);
+                canvas.drawLine(radius-14,0,radius,0,mPaint);
         }else{
-                canvas.drawLine(getWidth()/3-9,0,getWidth()/3,0,mPaint);
+                canvas.drawLine(radius-9,0,radius,0,mPaint);
             }
             canvas.rotate(1);
         }
@@ -155,15 +147,14 @@ public class ClockView extends View {
         //画数字
         mPaint.setTextSize(35);
         mPaint.setStyle(Paint.Style.FILL);
-        Rect textBound = new Rect();
         for (int i=0;i<12;i++){
             if(i==0){
                 mPaint.getTextBounds(12+"",0,(12+"").length(),textBound);
-                canvas.drawText(12+"",-textBound.width()/2,-(getWidth()/3-80),mPaint);
+                canvas.drawText(12+"",-textBound.width()/2,-(radius-80),mPaint);
                 canvas.rotate(30);
             }else{
                 mPaint.getTextBounds(i+"",0,(i+"").length(),textBound);
-                canvas.drawText(i+"",-textBound.width()/2,-(getWidth()/3-80),mPaint);
+                canvas.drawText(i+"",-textBound.width()/2,-(radius-80),mPaint);
                 canvas.rotate(30);
             }
         }
@@ -180,30 +171,17 @@ public class ClockView extends View {
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(4);
-        canvas.rotate(30);
+        canvas.rotate(minuteDegree);
         canvas.drawLine(0,0,0,-130,mPaint);
         canvas.restore();
         //时针
         canvas.save();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(7);
-        canvas.rotate(90);
+        canvas.rotate(hourDegree);
         canvas.drawLine(0,0,0,-120,mPaint);
         canvas.restore();
 
-//        drawCircle(canvas);
     }
-//    public void drawCircle(Canvas canvas){
-//        circlePaint.setStrokeWidth(circleWidth);
-//        circlePaint.setColor(circleColor);
-//        canvas.drawCircle(0,0,circleRadius,circlePaint);
-//        for (int i=0;i<60;i++){
-//            circlePaint.setStrokeWidth(pointerWidth);
-//            circlePaint.setStrokeWidth(pointerColor);
-//            canvas.drawLine(0,-circleRadius+circleWidth/2,0,-circleRadius+pointerWidth,circlePaint);
-//            canvas.rotate(6);
-//        }
-//
-//    }
 
 }
