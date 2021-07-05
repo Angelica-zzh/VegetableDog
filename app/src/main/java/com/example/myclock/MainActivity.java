@@ -23,10 +23,8 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = getClass().getSimpleName();
-    Calendar calendar;
     ClockView clockView;
     TextView textView1;
-    String s;
     TimerHandler mHandler = new TimerHandler();
     private Timer timer;
     SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日  HH:mm:ss");
@@ -75,9 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateClock(){
         Log.d(TAG,"update");
-        calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         Log.d(TAG,calendar.get(Calendar.SECOND)+"");
-        s = format.format(calendar.getTime());
+        String s = format.format(calendar.getTime());
         Log.d(TAG,s);
         textView1.setText(s);
         clockView.setTime(calendar);
