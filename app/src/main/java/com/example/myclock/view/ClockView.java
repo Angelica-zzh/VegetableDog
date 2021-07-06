@@ -44,33 +44,6 @@ public class ClockView extends View {
         initPaint();
 
     }
-//    private Timer timer = new Timer();
-//    private TimerTask timerTask = new TimerTask() {
-//        @Override
-//        public void run() {
-//            if(secondDegree == 360){
-//                secondDegree = 0;
-//            }
-//            if(hourDegree == 360){
-//                hourDegree = 0;
-//            }
-//            if(minuteDegree == 360){
-//                minuteDegree = 0;
-//            }
-//            secondDegree += 6;
-//            minuteDegree +=0.1f;
-//            hourDegree += 1.0f/120;
-//            postInvalidate();
-//        }
-//    };
-//    public void start(){
-//        timer.schedule(timerTask,0,1000);
-//    }
-//    public void stop(){
-//        if(timer!=null){
-//            timer.cancel();
-//        }
-//    }
     public void initPaint(){
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -122,7 +95,6 @@ public class ClockView extends View {
         super.onDraw(canvas);
         center.set(getWidth()/2, getHeight()/2);
         radius = getWidth()/3;
-//        Log.d(TAG, "ondraw: " + center + ", radius: " + radius);
 
         //画圆
         mPaint.setStrokeWidth(3);
