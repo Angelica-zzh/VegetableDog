@@ -22,9 +22,20 @@
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
         />
-    <TextClock
-        android:id="@+id/time"
+    <TextView
+        android:id="@+id/text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/clock_view"
+        android:layout_centerHorizontal="true"
+        />
+    <Button
+        android:id="@+id/videoplayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:layout_centerHorizontal="true"
+        android:text="@string/视频播放器"/>
+
 
 </RelativeLayout>

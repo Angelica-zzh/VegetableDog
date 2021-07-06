@@ -72,9 +72,6 @@ public class ClockView extends View {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         int second = calendar.get(Calendar.SECOND);
-        Log.d(TAG,"hour"+hour);
-        Log.d(TAG,"minute"+minute);
-        Log.d(TAG,"second"+second);
         //24小时制
         if(hour >= 12){
             hourDegree = (hour + minute * 1.0f/60f + second *1.0f/3600f -12)*30f;

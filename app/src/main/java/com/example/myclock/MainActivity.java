@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.QuoteSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -17,16 +19,20 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.example.myclock.tools.GetPath;
 import com.example.myclock.view.ClockView;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private final String TAG = getClass().getSimpleName();
+    private final int REQUEST_CODE_PHOTO = 1;
+    String filePath = null;
     ClockView clockView;
     TextView textView1;
     Button videoButton;
@@ -47,8 +53,7 @@ public class MainActivity extends AppCompatActivity {
         videoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, VideoView.class);
-                startActivity(intent);
+                openGallery();
             }
         });
 
@@ -61,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 mHandler.sendMessage(message);
             }
         },0,1000);
-
+        checkPermissions();
     }
 
     @Override
@@ -84,14 +89,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateClock(){
-        Log.d(TAG,"update");
         Calendar calendar = Calendar.getInstance();
         String s = format.format(calendar.getTime());
-        Log.d(TAG,s);
         textView1.setText(s);
         clockView.setTime(calendar);
 
 
+    }
+    //视频选择
+    public void openGallery() {
+        //从相册中选择
+        //Intent openAlbumIntent = new Intent(Intent.ACTION_PICK);
+        //openAlbumIntent.setType("image/*");
+        //startActivityForResult(openAlbumIntent, REQUST_CODE_PHOTO);
+        //按文件夹选择
+        Intent openAlbumIntent = new Intent(Intent.ACTION_PICK);
+        openAlbumIntent.setType("*/*");
+        Intent wrapperIntent = Intent.createChooser(openAlbumIntent, null);
+        startActivityForResult(wrapperIntent, REQUEST_CODE_PHOTO);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        filePath = null;
+        if (requestCode == REQUEST_CODE_PHOTO) {
+            if (resultCode == RESULT_OK) {
+                if (data != null) {
+                    Uri originalUri = data.getData();
+                    if (originalUri == null || originalUri.equals("")) {
+                        return;
+                    }
+                    Log.e(TAG, "originalUri=" + originalUri);
+                    filePath = GetPath.getPathFromUri(this, originalUri);
+                    Log.e(TAG, "filePath=" + filePath);
+                }
+                Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+                intent.putExtra("path",filePath);
+                startActivity(intent);
+            }
+        }
+
+        if (TextUtils.isEmpty(filePath)) {
+            return;
+        }
     }
 
 
