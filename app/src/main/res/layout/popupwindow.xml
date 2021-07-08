@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layout"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:orientation="horizontal"
-    android:background="">
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:layout_centerInParent="true"
+    android:layout_below="@+id/button_table"
+    android:background="#88000000"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:visibility="invisible">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@drawable/bottom_shadow"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:layout_alignParentBottom="true"
+        >
+        <ImageView
+            android:id="@+id/play_and_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_video_pause"
+            android:layout_gravity="left"
+            />
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
+            />
 
-</LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
