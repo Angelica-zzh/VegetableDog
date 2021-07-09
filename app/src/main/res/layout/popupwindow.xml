@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:layout_centerInParent="true"
-    android:layout_below="@+id/button_table"
+<RelativeLayout
+    android:id="@+id/controller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#88000000"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:visibility="invisible">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:visibility="visible">
+    <LinearLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -15,6 +15,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:layout_alignParentBottom="true"
+
         >
         <ImageView
             android:id="@+id/play_and_pause"
@@ -23,11 +24,35 @@
             android:src="@mipmap/ic_video_pause"
             android:layout_gravity="left"
             />
-        <SeekBar
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="match_parent">
+            <SeekBar
+                android:id="@+id/progressBar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
 
-            />
+                />
+            <TextView
+                android:id="@+id/time_table"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="00:00"
+                android:gravity="center"
+
+                />
+            <ImageView
+                android:id="@+id/full_screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_video_fullscreen"
+                android:layout_gravity="right"
+                android:padding="10dp"/>
+        </LinearLayout>
+
+
 
     </LinearLayout>
 </RelativeLayout>

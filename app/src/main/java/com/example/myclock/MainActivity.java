@@ -21,6 +21,7 @@ import android.widget.VideoView;
 
 import com.example.myclock.tools.GetPath;
 import com.example.myclock.view.ClockView;
+import com.example.myclock.view.PlayerLayout;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -32,14 +33,13 @@ import java.util.TimerTask;
 public class MainActivity extends BaseActivity {
     private final String TAG = getClass().getSimpleName();
     private final int REQUEST_CODE_PHOTO = 1;
-    String filePath = null;
-    ClockView clockView;
-    TextView textView1;
-    Button videoButton;
-    TimerHandler mHandler = new TimerHandler();
+    private String filePath = null;
+    private ClockView clockView;
+    private TextView textView1;
+    private Button videoButton;
+    private TimerHandler mHandler = new TimerHandler();
     private Timer timer;
-    SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日  HH:mm:ss");
-
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日  HH:mm:ss");
     private static final int MSG_CLOCK = 123;
 
     @Override

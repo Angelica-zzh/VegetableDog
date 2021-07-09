@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,22 +31,27 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myclock.tools.GetPath;
+import com.example.myclock.view.PlayerLayout;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class VideoActivity extends AppCompatActivity{
     private final String TAG = getClass().getSimpleName();
-    ImageView playAndPauseButton;
-    View controllerView;
-    Context mContext = this;
-    MediaPlayer mediaPlayer;
-    SurfaceHolder surfaceHolder;
-    SurfaceView surfaceView;
-    String path;
-    VideoViewModel videoViewModel;
-    mHandler handler = new mHandler();
-    private final static int WHAT = 0;
+    private ImageView playAndPauseButton;
+    private ImageView fullScreen;
+    private TextView processTime;
+    private SeekBar processBar;
+    private View controllerView;
+    private PlayerLayout playerLayout;
+    private SurfaceHolder surfaceHolder;
+    private SurfaceView surfaceView;
+    private String path;
+    private VideoViewModel videoViewModel;
+    private mHandler handler = new mHandler();
+    private final static int UPDATE = 0;
     private static final int HIDDEN_TIME = 5000;
 
     private Runnable r = new Runnable() {
@@ -59,22 +66,31 @@ public class VideoActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
 
-//        mediaPlayer = new MediaPlayer();
-
         playAndPauseButton = (ImageView) findViewById(R.id.play_and_pause);
-//        pauseButton = (Button)findViewById(R.id.pause_video);
-//        stopButton = (Button)findViewById(R.id.stop_video);
+        processBar = (SeekBar)findViewById(R.id.progressBar);
+        fullScreen = (ImageView) findViewById(R.id.full_screen);
+        processTime = (TextView)findViewById(R.id.time_table);
 
         playAndPauseButton.setOnClickListener(listener);
-//        pauseButton.setOnClickListener(listener);
-//        stopButton.setOnClickListener(listener);
+
+
 
         videoViewModel =new ViewModelProvider(this).get(VideoViewModel.class);
         videoViewModel.getCurrentState().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 if(integer == 1){
-
+                    if(videoViewModel.mediaExist()){
+                        if(videoViewModel.getCurrentPosition() > 0){
+                            processTime.setText(formatTime(videoViewModel.getCurrentPosition()));
+                            int progress = (int)((videoViewModel.getCurrentPosition()/
+                                    (float) videoViewModel.getDuration()) * 100);
+                            processBar.setProgress(progress);
+                        }else {
+                            processTime.setText("00:00");
+                            processBar.setProgress(0);
+                        }
+                    }
                 }else if(integer == 2){
                     playAndPauseButton.setImageResource(R.mipmap.ic_video_pause);
                 }else if(integer == 3){
@@ -89,6 +105,7 @@ public class VideoActivity extends AppCompatActivity{
         surfaceView = (SurfaceView)findViewById(R.id.surfaceview_videoplayer);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(callback);
+        playerLayout = new PlayerLayout(this);
 
 
         controllerView = findViewById(R.id.popwindow);
@@ -104,6 +121,25 @@ public class VideoActivity extends AppCompatActivity{
                         showOrHideController();
                 }
                 return true;
+            }
+        });
+        processBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser){
+                    videoViewModel.progressChange(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                handler.removeCallbacks(r);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+                handler.postDelayed(r,HIDDEN_TIME);
             }
         });
 
@@ -124,10 +160,11 @@ public class VideoActivity extends AppCompatActivity{
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-//            switch (msg.what){
-//                case WHAT:
-//            }
         }
+    }
+    private String formatTime(long time){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+        return simpleDateFormat.format(new Date(time));
     }
 
     private View.OnClickListener listener = new View.OnClickListener() {
@@ -144,11 +181,7 @@ public class VideoActivity extends AppCompatActivity{
 
     @Override
     protected void onDestroy() {
-        if(mediaPlayer != null && mediaPlayer.isPlaying()){
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer=null;
-        }
+        videoViewModel.destroyMediaPlayer();
         super.onDestroy();
     }
 
@@ -156,8 +189,13 @@ public class VideoActivity extends AppCompatActivity{
         @Override
         public void surfaceCreated(@NonNull SurfaceHolder holder) {
             Log.d(TAG,"surface被创建");
-                videoViewModel.initMedia(path,surfaceHolder);
 
+            videoViewModel.initMedia(path,surfaceHolder);
+            playerLayout.setAspectRatio(videoViewModel.getMediaPlayerWidth()
+                    ,videoViewModel.getMediaPlayerHeight());
+            Log.d(TAG,"视频比例"+surfaceView.getWidth()/videoViewModel.getMediaPlayerWidth()
+                    +" "+surfaceView.getHeight()/videoViewModel.getMediaPlayerHeight()+"surfaceview长宽"
+            +surfaceView.getHeight()+" "+surfaceView.getWidth());
         }
 
         @Override
@@ -171,5 +209,6 @@ public class VideoActivity extends AppCompatActivity{
             videoViewModel.destroyMediaPlayer();
         }
     };
+
 }
 

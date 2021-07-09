@@ -1,5 +1,6 @@
 package com.example.myclock;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -10,14 +11,18 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.myclock.tools.ThreadUtils;
+import com.example.myclock.view.PlayerLayout;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class VideoViewModel extends ViewModel {
     private final String TAG = getClass().getSimpleName();
-    MediaPlayer mediaPlayer = new MediaPlayer();
-    int currentPosition = 0;
-//    private final int FLAG_STATE_PLAYER_PLAY = 1;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private int currentPosition = 0;
+    private int mediaPlayerWidth;
+    private int mediaPlayerHeight;
+    private final int FLAG_STATE_PLAYER_PLAY = 1;
     private final int FLAG_STATE_PLAYER_PAUSE = 2;
     private final int FLAG_STATE_PLAYER_CONTI = 3;
 
@@ -31,22 +36,44 @@ public class VideoViewModel extends ViewModel {
     }
 
     public int getCurrentPosition() {
+        currentPosition = mediaPlayer.getCurrentPosition();
         return currentPosition;
     }
+    public int getDuration(){
+        int playerDuration = mediaPlayer.getDuration();
+        return playerDuration;
+    }
+    public boolean mediaExist(){
+        return mediaPlayer!=null;
+    }
+    public int getMediaPlayerWidth(){ return mediaPlayerWidth;}
+    public int getMediaPlayerHeight(){ return mediaPlayerHeight;}
 
+    Runnable r =new Runnable() {
+        @Override
+        public void run() {
+            currentState.postValue(FLAG_STATE_PLAYER_PLAY);
+        }
+    };
     public void initMedia(String path, SurfaceHolder surfaceHolder) {
         try {
-//            mediaPlayer = new MediaPlayer();
+//            mediaPlayer = new MediaPlayer();;
+//            playerLayout.setAspectRatio(mediaPlayer.getVideoWidth(),mediaPlayer.getVideoHeight());
             mediaPlayer.setDataSource(path);
             mediaPlayer.setDisplay(surfaceHolder);
-            Log.d(TAG, "开始装载");
+
             mediaPlayer.prepare();
+            Log.d(TAG, "视频长宽"+mediaPlayer.getVideoWidth()+" "+mediaPlayer.getVideoHeight());
+            mediaPlayerWidth = mediaPlayer.getVideoWidth();
+            mediaPlayerHeight = mediaPlayer.getVideoHeight();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     Log.d(TAG, "装载完成");
                     mediaPlayer.start();
                     mediaPlayer.seekTo(currentPosition);
+                    currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
+                    ThreadUtils.getInstance().scheduleExecure(r,0,1000, TimeUnit.MILLISECONDS);
                 }
             });
             //设置循环播放
@@ -94,6 +121,11 @@ public class VideoViewModel extends ViewModel {
         currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
 
     }
+    //进度条改变
+    public void progressChange(int progress){
+        int playtime = progress * mediaPlayer.getDuration() / 100;
+        mediaPlayer.seekTo(playtime);
+    }
 //    //停止播放
 //    public void mediaStop(){
 //        if(mediaPlayer != null && mediaPlayer.isPlaying()){
@@ -110,6 +142,8 @@ public class VideoViewModel extends ViewModel {
         if(mediaPlayer != null && mediaPlayer.isPlaying()){
             currentPosition = mediaPlayer.getCurrentPosition();
             mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
         }
     }
 }

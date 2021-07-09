@@ -17,9 +17,6 @@ import com.example.myclock.R;
 import com.example.myclock.tools.Utils;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ClockView extends View {
 

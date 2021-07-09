@@ -3,20 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
+<com.example.myclock.view.PlayerLayout
+    android:id="@+id/playerlayout"
+    android:layout_width="match_parent"
+    android:layout_height="260dp"
+    android:layout_centerInParent="true">
     <SurfaceView
         android:id="@+id/surfaceview_videoplayer"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
+        />
+    <include
+        android:id="@+id/popwindow"
+        layout="@layout/popupwindow"
         />
 
 
-        <include
-            android:id="@+id/popwindow"
-            layout="@layout/popupwindow"
-            />
-
-
+</com.example.myclock.view.PlayerLayout>
 
 </RelativeLayout>
