@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
 <com.example.myclock.view.PlayerLayout
-    android:id="@+id/playerlayout"
+    android:id="@+id/surfacelayout"
     android:layout_width="match_parent"
-    android:layout_height="260dp"
+    android:layout_height="300dp"
     android:layout_centerInParent="true">
     <SurfaceView
         android:id="@+id/surfaceview_videoplayer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
         />
     <include
         android:id="@+id/popwindow"

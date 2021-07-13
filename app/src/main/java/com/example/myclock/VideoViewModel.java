@@ -22,17 +22,19 @@ public class VideoViewModel extends ViewModel {
     private int currentPosition = 0;
     private int mediaPlayerWidth;
     private int mediaPlayerHeight;
-    private final int FLAG_STATE_PLAYER_PLAY = 1;
+    private final int FLAG_STATE_PLAYER_PROCESS = 1;
     private final int FLAG_STATE_PLAYER_PAUSE = 2;
     private final int FLAG_STATE_PLAYER_CONTI = 3;
 
-    MutableLiveData<Integer> currentState;
 
+    MutableLiveData<Integer> currentState = new MutableLiveData<>();
     public MutableLiveData<Integer> getCurrentState() {
-        if (currentState == null) {
-            currentState = new MutableLiveData<Integer>();
-        }
         return currentState;
+    }
+
+    MutableLiveData<Integer> processState = new MutableLiveData<>();
+    public MutableLiveData<Integer> getProcessState() {
+        return processState;
     }
 
     public int getCurrentPosition() {
@@ -52,27 +54,23 @@ public class VideoViewModel extends ViewModel {
     Runnable r =new Runnable() {
         @Override
         public void run() {
-            currentState.postValue(FLAG_STATE_PLAYER_PLAY);
+            processState.postValue(FLAG_STATE_PLAYER_PROCESS);
         }
     };
     public void initMedia(String path, SurfaceHolder surfaceHolder) {
         try {
-//            mediaPlayer = new MediaPlayer();;
-//            playerLayout.setAspectRatio(mediaPlayer.getVideoWidth(),mediaPlayer.getVideoHeight());
             mediaPlayer.setDataSource(path);
             mediaPlayer.setDisplay(surfaceHolder);
-
             mediaPlayer.prepare();
-            Log.d(TAG, "视频长宽"+mediaPlayer.getVideoWidth()+" "+mediaPlayer.getVideoHeight());
             mediaPlayerWidth = mediaPlayer.getVideoWidth();
             mediaPlayerHeight = mediaPlayer.getVideoHeight();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     Log.d(TAG, "装载完成");
+                    currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
                     mediaPlayer.start();
                     mediaPlayer.seekTo(currentPosition);
-                    currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
                     ThreadUtils.getInstance().scheduleExecure(r,0,1000, TimeUnit.MILLISECONDS);
                 }
             });
@@ -99,14 +97,16 @@ public class VideoViewModel extends ViewModel {
     }
 
     public void playAndPause(){
-        if(currentState.getValue().intValue() == FLAG_STATE_PLAYER_PAUSE){
-            mediaPlayer.pause();
-            //设置图标为播放
-            currentState.postValue(FLAG_STATE_PLAYER_CONTI);
-        }else {
+        if(currentState.getValue().intValue() == FLAG_STATE_PLAYER_CONTI){
             mediaPlayer.start();
             //设置图标为暂停
             currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
+            Log.d(TAG, "继续");
+        }else if(currentState.getValue().intValue() == FLAG_STATE_PLAYER_PAUSE){
+            mediaPlayer.pause();
+            //设置图标为播放
+            currentState.postValue(FLAG_STATE_PLAYER_CONTI);
+            Log.d(TAG, "暂停");
         }
     }
 
@@ -126,17 +126,7 @@ public class VideoViewModel extends ViewModel {
         int playtime = progress * mediaPlayer.getDuration() / 100;
         mediaPlayer.seekTo(playtime);
     }
-//    //停止播放
-//    public void mediaStop(){
-//        if(mediaPlayer != null && mediaPlayer.isPlaying()){
-//            mediaPlayer.stop();
-//            mediaPlayer.release();
-//            mediaPlayer=null;
-////            playButton.setEnabled(true);
-////            Toast.makeText(VideoActivity.this,"停止播放",Toast.LENGTH_LONG).show();
-//        }
-//        currentState.postValue(FLAG_STATE_PLAYER_STOP);
-//    }
+
     //destroy mediaPlayer
     public void destroyMediaPlayer(){
         if(mediaPlayer != null && mediaPlayer.isPlaying()){

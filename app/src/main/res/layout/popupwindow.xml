@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="#88000000"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:visibility="visible">
     <LinearLayout
         android:id="@+id/layout"
@@ -19,19 +20,19 @@
         >
         <ImageView
             android:id="@+id/play_and_pause"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:src="@mipmap/ic_video_pause"
+            android:padding="5dp"
             android:layout_gravity="left"
             />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+
             <SeekBar
                 android:id="@+id/progressBar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
+                android:layout_weight="4"
 
                 />
             <TextView
@@ -40,19 +41,44 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="00:00"
+                android:textColor="@color/white"
                 android:gravity="center"
-
                 />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:text="/"
+                android:textColor="@color/white"
+                android:gravity="center"
+                />
+            <TextView
+                android:id="@+id/time_duration"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:gravity="center"
+                />
+
             <ImageView
                 android:id="@+id/full_screen"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:src="@mipmap/ic_video_fullscreen"
                 android:layout_gravity="right"
                 android:padding="10dp"/>
-        </LinearLayout>
-
-
 
     </LinearLayout>
+    <com.example.myclock.view.BatteryView
+        android:id="@+id/my_battery"
+        android:layout_width="20dp"
+        android:layout_height="10dp"
+        app:batteryPower = "70"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        />
 </RelativeLayout>
