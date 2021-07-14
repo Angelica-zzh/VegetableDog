@@ -49,22 +49,6 @@ public class ClockView extends View {
         mPaint.setStrokeWidth(1);
 
     }
-
-//    public void updateClock(){
-//        if(secondDegree == 360){
-//            secondDegree = 0;
-//        }
-//        if(hourDegree == 360){
-//            hourDegree = 0;
-//        }
-//        if(minuteDegree == 360){
-//            minuteDegree = 0;
-//        }
-//        secondDegree += 6;
-//        minuteDegree +=0.1f;
-//        hourDegree += 1.0f/120;
-//        invalidate();
-//    }
     public void setTime(Calendar calendar){
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);

@@ -2,6 +2,7 @@ package com.example.myclock;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.Button;
@@ -25,21 +26,31 @@ public class VideoViewModel extends ViewModel {
     private final int FLAG_STATE_PLAYER_PROCESS = 1;
     private final int FLAG_STATE_PLAYER_PAUSE = 2;
     private final int FLAG_STATE_PLAYER_CONTI = 3;
+    private final int SPEED_1 = 1;
+    private final int SPEED_2 = 2;
 
-
+    //播放状态
     MutableLiveData<Integer> currentState = new MutableLiveData<>();
     public MutableLiveData<Integer> getCurrentState() {
         return currentState;
     }
-
+    //播放进度
     MutableLiveData<Integer> processState = new MutableLiveData<>();
     public MutableLiveData<Integer> getProcessState() {
         return processState;
+    }
+    //播放速度
+    MutableLiveData<Integer> speedState = new MutableLiveData<>();
+    public MutableLiveData<Integer> getCurrentSpeed() {
+        return speedState;
     }
 
     public int getCurrentPosition() {
         currentPosition = mediaPlayer.getCurrentPosition();
         return currentPosition;
+    }
+    public void setCurrentPosition(){
+        currentPosition = mediaPlayer.getCurrentPosition();
     }
     public int getDuration(){
         int playerDuration = mediaPlayer.getDuration();
@@ -57,8 +68,13 @@ public class VideoViewModel extends ViewModel {
             processState.postValue(FLAG_STATE_PLAYER_PROCESS);
         }
     };
+    //初始化mediaplayer
     public void initMedia(String path, SurfaceHolder surfaceHolder) {
+        if(mediaPlayer == null){
+            mediaPlayer = new MediaPlayer();
+        }
         try {
+            mediaPlayer.reset();
             mediaPlayer.setDataSource(path);
             mediaPlayer.setDisplay(surfaceHolder);
             mediaPlayer.prepare();
@@ -69,6 +85,8 @@ public class VideoViewModel extends ViewModel {
                 public void onPrepared(MediaPlayer mp) {
                     Log.d(TAG, "装载完成");
                     currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
+                    speedState.postValue(1);
+                    speedChange(1);
                     mediaPlayer.start();
                     mediaPlayer.seekTo(currentPosition);
                     ThreadUtils.getInstance().scheduleExecure(r,0,1000, TimeUnit.MILLISECONDS);
@@ -95,7 +113,7 @@ public class VideoViewModel extends ViewModel {
 
         }
     }
-
+//暂停和播放操作
     public void playAndPause(){
         if(currentState.getValue().intValue() == FLAG_STATE_PLAYER_CONTI){
             mediaPlayer.start();
@@ -125,6 +143,23 @@ public class VideoViewModel extends ViewModel {
     public void progressChange(int progress){
         int playtime = progress * mediaPlayer.getDuration() / 100;
         mediaPlayer.seekTo(playtime);
+    }
+    //倍速播放
+    public void speedChange(float speed){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            PlaybackParams playbackParams = mediaPlayer.getPlaybackParams();
+            playbackParams.setSpeed(speed);
+            mediaPlayer.setPlaybackParams(playbackParams);
+        }
+    }
+    public void setSpeed(){
+        if(speedState.getValue() == 1){
+            speedChange(2);
+            speedState.postValue(SPEED_2);
+        }else {
+            speedChange(1);
+            speedState.postValue(SPEED_1);
+        }
     }
 
     //destroy mediaPlayer

@@ -81,8 +81,8 @@ public class BatteryView extends View {
         //设置电池头颜色为黑色
         paint.setColor(Color.WHITE);
         canvas.drawRect(r3, paint);
-        //画电量
-        paint.setColor(Color.BLACK);
+        //画电量数值
+        paint.setColor(Color.WHITE);
         paint.setStrokeWidth(strokeWidth/3);
         paint.setTextSize(height-strokeWidth*2);
         paint.setTextAlign(Paint.Align.CENTER);

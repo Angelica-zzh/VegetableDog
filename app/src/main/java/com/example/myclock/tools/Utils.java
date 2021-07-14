@@ -1,6 +1,7 @@
 package com.example.myclock.tools;
 
 import android.content.Context;
+import android.view.GestureDetector;
 
 public class Utils {
     public static int dip2px(Context context, float dpValue) {

@@ -18,8 +18,9 @@
         android:id="@+id/popwindow"
         layout="@layout/popupwindow"
         />
-
-
 </com.example.myclock.view.PlayerLayout>
-
+<include
+    android:id="@+id/player_volume"
+    layout="@layout/player_volume"
+    />
 </RelativeLayout>
