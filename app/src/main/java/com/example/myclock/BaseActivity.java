@@ -26,6 +26,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION = 1;
     private final String[] PERMISSIONS = new String[] {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_SETTINGS
 //            Manifest.permission.CAMERA,
 //            Manifest.permission.READ_PHONE_STATE,
 //            Manifest.permission.INTERNET

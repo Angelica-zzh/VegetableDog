@@ -145,20 +145,32 @@ public class VideoViewModel extends ViewModel {
         mediaPlayer.seekTo(playtime);
     }
     //倍速播放
-    public void speedChange(float speed){
+    public boolean speedChange(float speed){
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            PlaybackParams playbackParams = mediaPlayer.getPlaybackParams();
-            playbackParams.setSpeed(speed);
-            mediaPlayer.setPlaybackParams(playbackParams);
+            try {
+                PlaybackParams playbackParams = mediaPlayer.getPlaybackParams();
+                playbackParams.setSpeed(speed);
+                mediaPlayer.setPlaybackParams(playbackParams);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
+        return false;
     }
     public void setSpeed(){
+
         if(speedState.getValue() == 1){
-            speedChange(2);
-            speedState.postValue(SPEED_2);
+            if(speedChange(2)){
+                speedChange(2);
+                speedState.postValue(SPEED_2);
+            }
         }else {
-            speedChange(1);
-            speedState.postValue(SPEED_1);
+            if(speedChange(1)){
+                speedChange(1);
+                speedState.postValue(SPEED_1);
+            }
         }
     }
 

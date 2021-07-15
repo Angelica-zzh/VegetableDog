@@ -19,8 +19,14 @@
         layout="@layout/popupwindow"
         />
 </com.example.myclock.view.PlayerLayout>
+    <!--声音-->
 <include
     android:id="@+id/player_volume"
     layout="@layout/player_volume"
     />
+<!--亮度-->
+    <include
+        android:id="@+id/player_brightness"
+        layout="@layout/player_brightness"
+        />
 </RelativeLayout>

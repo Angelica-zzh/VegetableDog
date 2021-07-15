@@ -1,10 +1,13 @@
 package com.example.myclock;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.LightingColorFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 
@@ -13,12 +16,14 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +45,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myclock.tools.DisplayUtils;
 import com.example.myclock.tools.GetPath;
+import com.example.myclock.tools.LightnessControl;
 import com.example.myclock.view.BatteryView;
 import com.example.myclock.view.PlayerLayout;
 
@@ -145,6 +151,8 @@ public class VideoActivity extends AppCompatActivity{
         });
         //初始化音量
         initVolume();
+        //初始化亮度
+        initBrightness();
 
         //设置电池
         batteryView = (BatteryView) findViewById(R.id.my_battery);
@@ -183,10 +191,10 @@ public class VideoActivity extends AppCompatActivity{
                     case MotionEvent.ACTION_MOVE:
                         int distanceX = (int)event.getX() - downX;
                         int distanceY = (int)event.getY() - downY;
-                       if(event.getX()<DisplayUtils.getScreenWidthPixels(VideoActivity.this)/2){
-                           changeVolume(event,distanceX,distanceY);
+                       if(event.getX()>DisplayUtils.getScreenWidthPixels(VideoActivity.this)/2){
+                           changeVolume(distanceX,distanceY);
                        }else {
-                           changeBrightness(event,distanceX,distanceY);
+                           changeBrightness(distanceX,distanceY);
                        }
                         break;
                 }
@@ -327,6 +335,8 @@ public class VideoActivity extends AppCompatActivity{
         float batteryPct = level * 100 / (float)scale;
         batteryView.setPower((int)batteryPct);
     }
+
+    //初始化音量
     private AudioManager audioManager;
     private RelativeLayout volume_layout;
     private ImageView volume_picture;
@@ -345,7 +355,7 @@ public class VideoActivity extends AppCompatActivity{
     }
 
     //改变音量
-    private void changeVolume(MotionEvent event,int x,int y){
+    private void changeVolume(int x,int y){
         volume_layout.setVisibility(View.VISIBLE);
         currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         if(currentVolume == 0){
@@ -360,7 +370,7 @@ public class VideoActivity extends AppCompatActivity{
                 Log.d("音量减少",currentVolume+"");
             }
         }else if(Math.abs(x)<50 && y< -150){
-            if(currentVolume<100){
+            if(currentVolume<maxVolume){
                 currentVolume++;
                 Log.d("音量增加",currentVolume+"");
             }
@@ -377,8 +387,58 @@ public class VideoActivity extends AppCompatActivity{
             }
         },HIDDEN_TIME);
     }
+
+    private RelativeLayout brightness_layout;
+    private TextView brightnessNum;
+    private int currentLight;
+
+//    初始化亮度
+    private void initBrightness(){
+        brightness_layout = (RelativeLayout)findViewById(R.id.player_brightness);
+        brightnessNum = (TextView)findViewById(R.id.brightness);
+        brightness_layout.setVisibility(View.INVISIBLE);
+
+        ContentResolver contentResolver = this.getContentResolver();
+        try {
+            int mode = Settings.System.getInt(contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE);
+            if (mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     //改变亮度
-    private void changeBrightness(MotionEvent event,int x,int y){}
+    private void changeBrightness(int x,int y){
+        brightness_layout.setVisibility(View.VISIBLE);
+
+        if(Math.abs(x)<50 && y>150){
+            //降低亮度
+            if(LightnessControl.GetLightness(this)>10){
+                LightnessControl.SetLightness(this, -10);
+                Log.d("亮度减少",LightnessControl.GetLightness(this)+"");
+            }
+        }else if(Math.abs(x)<50 && y< -150){
+            //增加亮度
+            if(LightnessControl.GetLightness(this)<245){
+                LightnessControl.SetLightness(this, 10);
+                Log.d("亮度增加",LightnessControl.GetLightness(this)+"");
+            }
+        }
+        currentLight = LightnessControl.GetLightness(this);
+        int percentage = (currentLight*100)/255;
+        brightnessNum.setText("亮度："+percentage+"%");
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(brightness_layout.isShown()){
+                    brightness_layout.setVisibility(View.INVISIBLE);
+                }
+            }
+        },HIDDEN_TIME);
+    }
 
 
 

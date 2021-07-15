@@ -72,6 +72,7 @@
                 android:padding="10dp"/>
 
     </LinearLayout>
+    <!--自定义电池控件-->
     <com.example.myclock.view.BatteryView
         android:id="@+id/my_battery"
         android:layout_width="20dp"
