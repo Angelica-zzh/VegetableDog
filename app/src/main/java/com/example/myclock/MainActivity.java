@@ -1,32 +1,23 @@
 package com.example.myclock;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.QuoteSpan;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.example.myclock.tools.GetPath;
 import com.example.myclock.view.ClockView;
-import com.example.myclock.view.PlayerLayout;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,6 +32,7 @@ public class MainActivity extends BaseActivity {
     private Timer timer;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日  HH:mm:ss");
     private static final int MSG_CLOCK = 123;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -141,7 +141,7 @@ public class VideoViewModel extends ViewModel {
     }
     //进度条改变
     public void progressChange(int progress){
-        int playtime = progress * mediaPlayer.getDuration() / 100;
+        int playtime = (int)(progress * (mediaPlayer.getDuration() / (float)100));
         mediaPlayer.seekTo(playtime);
     }
     //倍速播放
@@ -154,9 +154,11 @@ public class VideoViewModel extends ViewModel {
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.d("倍速播放失败", "传入的PlaybackParams不被支持");
                 return false;
             }
         }
+        Log.d("倍速播放失败", "系统版本问题");
         return false;
     }
     public void setSpeed(){
@@ -165,11 +167,13 @@ public class VideoViewModel extends ViewModel {
             if(speedChange(2)){
                 speedChange(2);
                 speedState.postValue(SPEED_2);
+                currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
             }
         }else {
             if(speedChange(1)){
                 speedChange(1);
                 speedState.postValue(SPEED_1);
+                currentState.postValue(FLAG_STATE_PLAYER_PAUSE);
             }
         }
     }

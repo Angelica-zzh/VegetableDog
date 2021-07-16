@@ -106,6 +106,7 @@ public class VideoActivity extends AppCompatActivity{
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser){
                     videoViewModel.progressChange(progress);
+                    changeProcess();
                 }
             }
             //进度条拖动开始拖动的时候调用
@@ -137,6 +138,7 @@ public class VideoActivity extends AppCompatActivity{
                             View.SYSTEM_UI_FLAG_VISIBLE);
 
                 } else if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+//                    竖屏改横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     surfaceLayout.getLayoutParams().width = WindowManager.LayoutParams.MATCH_PARENT;
                     surfaceLayout.getLayoutParams().height = WindowManager.LayoutParams.MATCH_PARENT;
@@ -153,6 +155,8 @@ public class VideoActivity extends AppCompatActivity{
         initVolume();
         //初始化亮度
         initBrightness();
+        //初始化前进后退
+        initForwardAndBack();
 
         //设置电池
         batteryView = (BatteryView) findViewById(R.id.my_battery);
@@ -165,6 +169,8 @@ public class VideoActivity extends AppCompatActivity{
         Intent intent = getIntent();
         path = intent.getStringExtra("path");
 
+        //一开始延迟五秒隐藏控制栏
+        handler.postDelayed(r,HIDDEN_TIME);
         //给surfaceView添加回调办法
         surfaceView = (SurfaceView)findViewById(R.id.surfaceview_videoplayer);
         surfaceHolder = surfaceView.getHolder();
@@ -191,11 +197,21 @@ public class VideoActivity extends AppCompatActivity{
                     case MotionEvent.ACTION_MOVE:
                         int distanceX = (int)event.getX() - downX;
                         int distanceY = (int)event.getY() - downY;
-                       if(event.getX()>DisplayUtils.getScreenWidthPixels(VideoActivity.this)/2){
-                           changeVolume(distanceX,distanceY);
-                       }else {
-                           changeBrightness(distanceX,distanceY);
-                       }
+                        if(Math.abs(distanceX)>100 && Math.abs(distanceY)<20){
+                            Log.d("手势左右划动","改变进度条");
+                            if(distanceX>0){
+                                playForward(distanceX);
+                            }else {
+                                playBackward(distanceX);
+                            }
+                        }else if(Math.abs(distanceX)<50 && Math.abs(distanceY)>150){
+                            Log.d("手势改变音量和亮度","改变");
+                            if(event.getX()>DisplayUtils.getScreenWidthPixels(VideoActivity.this)/2){
+                                changeVolume(distanceX,distanceY);
+                            }else if(event.getX()<DisplayUtils.getScreenWidthPixels(VideoActivity.this)/2){
+                                changeBrightness(distanceX,distanceY);
+                            }
+                        }
                         break;
                 }
                 return false;
@@ -211,17 +227,7 @@ public class VideoActivity extends AppCompatActivity{
             @Override
             public void onChanged(Integer integer) {
                 if(integer == 1) {
-                    if (videoViewModel.mediaExist()) {
-                        if (videoViewModel.getCurrentPosition() > 0) {
-                            processTime.setText(formatTime(videoViewModel.getCurrentPosition()));
-                            int progress = (int) ((videoViewModel.getCurrentPosition() /
-                                    (float) videoViewModel.getDuration()) * 100);
-                            processBar.setProgress(progress);
-                        } else {
-                            processTime.setText("00:00");
-                            processBar.setProgress(0);
-                        }
-                    }
+                    changeProcess();
                 }
                 initBattery();
             }
@@ -255,6 +261,56 @@ public class VideoActivity extends AppCompatActivity{
                 }
             }
         });
+    }
+    //进度条改变
+    private void changeProcess(){
+        if (videoViewModel.mediaExist()) {
+            if (videoViewModel.getCurrentPosition() > 0) {
+                processTime.setText(formatTime(videoViewModel.getCurrentPosition()));
+                int progress = (int) ((videoViewModel.getCurrentPosition() /
+                        (float) videoViewModel.getDuration()) * 100);
+                processBar.setProgress(progress);
+            } else {
+                processTime.setText("00:00");
+                processBar.setProgress(0);
+            }
+        }
+    }
+
+    //前进后退状态显示
+    RelativeLayout forwardLayout;
+    RelativeLayout backwardLayout;
+    TextView forwardText;
+    TextView backwardText;
+
+    private void initForwardAndBack(){
+        forwardLayout = findViewById(R.id.player_forward);
+        backwardLayout = findViewById(R.id.player_backward);
+        forwardText = (TextView)findViewById(R.id.forward);
+        backwardText = (TextView)findViewById(R.id.backward);
+        forwardLayout.setVisibility(View.INVISIBLE);
+        backwardLayout.setVisibility(View.INVISIBLE);
+    }
+
+    //快进
+    private void playForward(int x){
+        int currentProcess = processBar.getProgress();
+        if(Math.abs(x)>200){
+            currentProcess += 2;
+        }
+        videoViewModel.progressChange(currentProcess);
+        changeProcess();
+        forwardLayout.setVisibility(View.VISIBLE);
+    }
+    //快退
+    private void playBackward(int y){
+        int currentProcess = processBar.getProgress();
+        if(Math.abs(y)>200){
+            currentProcess -= 2;
+        }
+        videoViewModel.progressChange(currentProcess);
+        changeProcess();
+        backwardLayout.setVisibility(View.VISIBLE);
 
     }
 
@@ -263,6 +319,7 @@ public class VideoActivity extends AppCompatActivity{
         if(controllerView.isShown()){
             Log.d(TAG,"设置不可见");
             controllerView.setVisibility(View.INVISIBLE);
+            handler.removeCallbacks(r);
         }else {
             Log.d(TAG,"设置可见");
             controllerView.setVisibility(View.VISIBLE);
@@ -357,6 +414,7 @@ public class VideoActivity extends AppCompatActivity{
     //改变音量
     private void changeVolume(int x,int y){
         volume_layout.setVisibility(View.VISIBLE);
+        brightness_layout.setVisibility(View.INVISIBLE);
         currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         if(currentVolume == 0){
             volume_picture.setImageResource(R.mipmap.mn_player_volume_close);
@@ -413,7 +471,7 @@ public class VideoActivity extends AppCompatActivity{
     //改变亮度
     private void changeBrightness(int x,int y){
         brightness_layout.setVisibility(View.VISIBLE);
-
+        volume_layout.setVisibility(View.INVISIBLE);
         if(Math.abs(x)<50 && y>150){
             //降低亮度
             if(LightnessControl.GetLightness(this)>10){

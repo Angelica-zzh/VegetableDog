@@ -29,4 +29,13 @@
         android:id="@+id/player_brightness"
         layout="@layout/player_brightness"
         />
+    <!--快进-->
+    <include
+        android:id="@+id/player_forward"
+        layout="@layout/player_forward"
+        />
+    <include
+        android:id="@+id/player_backward"
+        layout="@layout/player_backward"
+        />
 </RelativeLayout>
