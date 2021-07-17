@@ -89,7 +89,7 @@ public class VideoViewModel extends ViewModel {
                     speedChange(1);
                     mediaPlayer.start();
                     mediaPlayer.seekTo(currentPosition);
-                    ThreadUtils.getInstance().scheduleExecure(r,0,1000, TimeUnit.MILLISECONDS);
+                    ThreadUtils.getInstance().scheduleExecute(r,0,1000, TimeUnit.MILLISECONDS);
                 }
             });
             //设置循环播放

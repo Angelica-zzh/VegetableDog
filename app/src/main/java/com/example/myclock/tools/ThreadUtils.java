@@ -29,7 +29,7 @@ public class ThreadUtils {
     public void execute(Runnable runnable) {
         pool.execute(runnable);
     }
-    public void scheduleExecure(Runnable runnable, int delay, int period, TimeUnit timeUnit){
+    public void scheduleExecute(Runnable runnable, int delay, int period, TimeUnit timeUnit){
         spool.scheduleWithFixedDelay(runnable,delay,period,timeUnit);
 
     }

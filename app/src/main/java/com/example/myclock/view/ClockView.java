@@ -1,20 +1,15 @@
 package com.example.myclock.view;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-
-import com.example.myclock.R;
-import com.example.myclock.tools.Utils;
 
 import java.util.Calendar;
 

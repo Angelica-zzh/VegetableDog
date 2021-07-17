@@ -295,11 +295,14 @@ public class VideoActivity extends AppCompatActivity{
     //快进
     private void playForward(int x){
         int currentProcess = processBar.getProgress();
+        int forwardPosition = videoViewModel.getCurrentPosition();
         if(Math.abs(x)>200){
             currentProcess += 2;
         }
         videoViewModel.progressChange(currentProcess);
         changeProcess();
+        int currentPosition = videoViewModel.getCurrentPosition();
+        forwardText.setText(formatTime(Math.abs(currentPosition-forwardPosition)));
         forwardLayout.setVisibility(View.VISIBLE);
     }
     //快退
